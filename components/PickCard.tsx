@@ -13,14 +13,15 @@ export function PickCard({ pick }: { pick: DailyPick }) {
         : "text-ink-soft";
 
   return (
-    <div className="rounded-2xl border border-line bg-bg-card p-5 flex flex-col gap-4 hover:border-accent/40 transition">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-ink-soft">
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 text-accent px-2 py-0.5 font-medium">
+    <div className="group relative overflow-hidden rounded-2xl border border-line bg-bg-card/70 p-5 flex flex-col gap-4 hover:border-accent/40 hover:bg-bg-card transition">
+      <div className="pointer-events-none absolute -top-32 -right-32 h-64 w-64 rounded-full bg-accent/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="relative flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2 text-xs text-ink-soft flex-wrap">
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 text-accent px-2 py-0.5 font-medium">
             <Flame className="h-3 w-3" /> #{pick.rank}
           </span>
-          <span className="rounded-full bg-bg-elev px-2 py-0.5">{venueLabel}</span>
-          <span className="rounded-full bg-bg-elev px-2 py-0.5">
+          <span className="chip">{venueLabel}</span>
+          <span className="chip">
             Closes {new Date(pick.closeDate).toLocaleDateString()}
           </span>
         </div>
@@ -35,37 +36,51 @@ export function PickCard({ pick }: { pick: DailyPick }) {
         </a>
       </div>
 
-      <h3 className="text-[15px] font-semibold leading-snug">{pick.title}</h3>
+      <h3 className="relative text-[15px] font-semibold leading-snug tracking-tight">
+        {pick.title}
+      </h3>
 
-      <div className="grid grid-cols-4 gap-3 text-xs">
-        <Stat label="Side" value={<span className={`font-semibold ${sideColor}`}>{pick.side}</span>} />
-        <Stat label="Entry" value={`$${pick.entryPrice.toFixed(2)}`} />
-        <Stat label="Target" value={`$${pick.targetPrice.toFixed(2)}`} />
+      <div className="relative grid grid-cols-4 gap-3 text-xs">
+        <Stat
+          label="Side"
+          value={<span className={`font-semibold ${sideColor}`}>{pick.side}</span>}
+        />
+        <Stat label="Entry" value={`$${pick.entryPrice.toFixed(2)}`} mono />
+        <Stat label="Target" value={`$${pick.targetPrice.toFixed(2)}`} mono />
         <Stat
           label="Edge"
-          value={<span className={`font-semibold ${edgeColor}`}>{pick.edgePct.toFixed(1)}%</span>}
+          mono
+          value={
+            <span className={`font-semibold ${edgeColor}`}>
+              {pick.edgePct.toFixed(1)}%
+            </span>
+          }
         />
       </div>
 
-      <div className="h-px bg-line" />
+      <div className="relative h-px bg-line" />
 
-      <div className="flex items-center gap-2 text-[11px] text-ink-soft flex-wrap">
+      <div className="relative flex items-center gap-1.5 text-[11px] text-ink-soft flex-wrap">
         {pick.signals.map((s) => (
-          <span key={s} className="rounded-full bg-bg-elev px-2 py-0.5">
+          <span key={s} className="chip">
             {s}
           </span>
         ))}
       </div>
 
-      <p className="text-sm text-ink-soft leading-relaxed">{pick.rationale}</p>
+      <p className="relative text-sm text-ink-soft leading-relaxed">
+        {pick.rationale}
+      </p>
 
-      <div className="flex items-center justify-between text-xs">
+      <div className="relative flex items-center justify-between text-xs">
         <span className="text-ink-mute">Confidence</span>
-        <span className="font-medium text-ink">{pick.confidence}%</span>
+        <span className="font-medium text-ink font-mono">
+          {pick.confidence}%
+        </span>
       </div>
-      <div className="h-1.5 rounded-full bg-bg-elev overflow-hidden">
+      <div className="relative h-1.5 rounded-full bg-line overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-accent-cyan to-accent"
+          className="h-full bg-gradient-to-r from-accent-cyan via-accent to-accent-rose"
           style={{ width: `${pick.confidence}%` }}
         />
       </div>
@@ -73,11 +88,19 @@ export function PickCard({ pick }: { pick: DailyPick }) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: React.ReactNode }) {
+function Stat({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: React.ReactNode;
+  mono?: boolean;
+}) {
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-ink-mute">{label}</span>
-      <span className="text-ink">{value}</span>
+      <span className={`text-ink ${mono ? "font-mono" : ""}`}>{value}</span>
     </div>
   );
 }

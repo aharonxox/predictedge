@@ -13,20 +13,36 @@ export function AuthShell({
   footer?: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen hero-grid">
-      <header className="px-6 py-5">
-        <Link href="/">
+    <div className="relative min-h-screen overflow-hidden">
+      <div className="absolute inset-0 hero-grid" />
+      <div className="absolute inset-0 aurora" />
+      <header className="relative z-10 px-6 py-5">
+        <Link href="/" className="inline-flex">
           <Logo />
         </Link>
       </header>
-      <div className="px-6 pb-16 pt-6 flex justify-center">
-        <div className="w-full max-w-md rounded-2xl glass p-7 shadow-glow">
-          <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-          {subtitle ? (
-            <p className="mt-1.5 text-sm text-ink-soft">{subtitle}</p>
-          ) : null}
-          <div className="mt-6">{children}</div>
-          {footer ? <div className="mt-6 text-sm text-ink-soft">{footer}</div> : null}
+
+      <div className="relative z-10 px-4 pb-16 pt-4 flex justify-center">
+        <div className="w-full max-w-md">
+          <div className="gradient-border">
+            <div className="p-7 md:p-8">
+              <h1 className="text-[22px] font-semibold tracking-tightest">
+                {title}
+              </h1>
+              {subtitle ? (
+                <p className="mt-2 text-sm text-ink-soft leading-relaxed">
+                  {subtitle}
+                </p>
+              ) : null}
+              <div className="mt-6">{children}</div>
+              {footer ? (
+                <div className="mt-6 text-sm text-ink-soft">{footer}</div>
+              ) : null}
+            </div>
+          </div>
+          <p className="mt-4 text-center text-xs text-ink-mute">
+            No billing. No subscription. 10 days on us.
+          </p>
         </div>
       </div>
     </div>

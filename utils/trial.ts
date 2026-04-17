@@ -33,6 +33,7 @@ export function computeTrialStatus(createdAt: string | Date | null | undefined):
     trialEndsAt: new Date(endMs).toISOString(),
     daysRemaining: Math.floor(remainingMs / MS_PER_DAY),
     hoursRemaining: Math.floor((remainingMs % MS_PER_DAY) / MS_PER_HOUR),
+    totalDays: TRIAL_DAYS,
     expired: remainingMs <= 0,
   };
 }

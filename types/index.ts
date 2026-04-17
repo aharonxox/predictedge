@@ -3,6 +3,7 @@ export type TrialStatus = {
   trialEndsAt: string;
   daysRemaining: number;
   hoursRemaining: number;
+  totalDays: number;
   expired: boolean;
 };
 
