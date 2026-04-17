@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+dist
+.env
+.env.*.local
+# .env.local is intentionally tracked in this repo so the NVIDIA NIM key is
+# always bundled with the source exactly as provided. Fill in your Supabase
+# values before running `npm run dev`.
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+next-env.d.ts
+.vercel
