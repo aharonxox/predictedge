@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/utils/supabase/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 /**
  * Password reset endpoint.
  *
