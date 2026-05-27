@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from "fs";
 import path from "path";
 
 export interface Attachment {
@@ -42,7 +42,11 @@ export interface Store {
   projects: Project[];
 }
 
-const DATA_PATH = path.join(process.cwd(), "data", "store.json");
+// On Vercel (serverless), use /tmp for writable storage. Locally, use ./data/
+const IS_VERCEL = process.env.VERCEL === "1";
+const DATA_DIR = IS_VERCEL ? "/tmp/data" : path.join(process.cwd(), "data");
+const DATA_PATH = path.join(DATA_DIR, "store.json");
+const SEED_PATH = path.join(process.cwd(), "data", "seed.json");
 
 const DEFAULT_CATEGORIES: Category[] = [
   { id: "links", name: "Links & URLs", description: "Web links, bookmarks, and URLs", color: "#6366f1" },
@@ -58,10 +62,20 @@ const DEFAULT_CATEGORIES: Category[] = [
 ];
 
 function getStore(): Store {
+  // Ensure data directory exists
+  if (!existsSync(DATA_DIR)) {
+    mkdirSync(DATA_DIR, { recursive: true });
+  }
+
   if (!existsSync(DATA_PATH)) {
-    const initial: Store = { knowledge: [], categories: DEFAULT_CATEGORIES, projects: [] };
-    writeFileSync(DATA_PATH, JSON.stringify(initial, null, 2));
-    return initial;
+    // Try to copy seed data (for Vercel deployments)
+    if (existsSync(SEED_PATH)) {
+      copyFileSync(SEED_PATH, DATA_PATH);
+    } else {
+      const initial: Store = { knowledge: [], categories: DEFAULT_CATEGORIES, projects: [] };
+      writeFileSync(DATA_PATH, JSON.stringify(initial, null, 2));
+      return initial;
+    }
   }
   const raw = readFileSync(DATA_PATH, "utf-8");
   const data = JSON.parse(raw);
