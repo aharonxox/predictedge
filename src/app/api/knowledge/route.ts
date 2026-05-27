@@ -8,13 +8,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { title, content, category } = body;
+  const { title, content, category, attachments } = body;
 
   if (!title || !content || !category) {
     return Response.json({ error: "title, content, and category are required" }, { status: 400 });
   }
 
-  const item = addKnowledge({ id: uuidv4(), title, content, category });
+  const item = addKnowledge({ id: uuidv4(), title, content, category, attachments: attachments || undefined });
   return Response.json(item, { status: 201 });
 }
 

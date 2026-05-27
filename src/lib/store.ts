@@ -1,6 +1,14 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+export interface Attachment {
+  filename: string;
+  url: string;
+  originalName: string;
+  type: string;
+  size: number;
+}
+
 export interface KnowledgeItem {
   id: string;
   title: string;
@@ -8,6 +16,7 @@ export interface KnowledgeItem {
   category: string;
   createdAt: string;
   updatedAt: string;
+  attachments?: Attachment[];
 }
 
 export interface Category {
@@ -17,9 +26,20 @@ export interface Category {
   color: string;
 }
 
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  url?: string;
+  status: "active" | "paused" | "completed" | "idea";
+  type: "website" | "app" | "business" | "other";
+  createdAt: string;
+}
+
 export interface Store {
   knowledge: KnowledgeItem[];
   categories: Category[];
+  projects: Project[];
 }
 
 const DATA_PATH = path.join(process.cwd(), "data", "store.json");
@@ -39,12 +59,14 @@ const DEFAULT_CATEGORIES: Category[] = [
 
 function getStore(): Store {
   if (!existsSync(DATA_PATH)) {
-    const initial: Store = { knowledge: [], categories: DEFAULT_CATEGORIES };
+    const initial: Store = { knowledge: [], categories: DEFAULT_CATEGORIES, projects: [] };
     writeFileSync(DATA_PATH, JSON.stringify(initial, null, 2));
     return initial;
   }
   const raw = readFileSync(DATA_PATH, "utf-8");
-  return JSON.parse(raw);
+  const data = JSON.parse(raw);
+  if (!data.projects) data.projects = [];
+  return data;
 }
 
 function saveStore(store: Store): void {
@@ -120,6 +142,36 @@ export function deleteCategory(id: string): boolean {
   const idx = store.categories.findIndex((c) => c.id === id);
   if (idx === -1) return false;
   store.categories.splice(idx, 1);
+  saveStore(store);
+  return true;
+}
+
+export function getProjects(): Project[] {
+  return getStore().projects;
+}
+
+export function addProject(project: Omit<Project, "createdAt">): Project {
+  const store = getStore();
+  const newProject: Project = { ...project, createdAt: new Date().toISOString() };
+  store.projects.push(newProject);
+  saveStore(store);
+  return newProject;
+}
+
+export function updateProject(id: string, updates: Partial<Project>): Project | null {
+  const store = getStore();
+  const idx = store.projects.findIndex((p) => p.id === id);
+  if (idx === -1) return null;
+  store.projects[idx] = { ...store.projects[idx], ...updates };
+  saveStore(store);
+  return store.projects[idx];
+}
+
+export function deleteProject(id: string): boolean {
+  const store = getStore();
+  const idx = store.projects.findIndex((p) => p.id === id);
+  if (idx === -1) return false;
+  store.projects.splice(idx, 1);
   saveStore(store);
   return true;
 }

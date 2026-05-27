@@ -2,6 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 
+interface Attachment {
+  filename: string;
+  url: string;
+  originalName: string;
+  type: string;
+  size: number;
+}
+
 interface KnowledgeItem {
   id: string;
   title: string;
@@ -9,6 +17,7 @@ interface KnowledgeItem {
   category: string;
   createdAt: string;
   updatedAt: string;
+  attachments?: Attachment[];
 }
 
 interface Category {
@@ -32,7 +41,17 @@ interface CoachResponse {
   insights: CoachInsight[];
 }
 
-type Tab = "dashboard" | "import" | "add" | "categories" | "coach";
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  url?: string;
+  status: "active" | "paused" | "completed" | "idea";
+  type: "website" | "app" | "business" | "other";
+  createdAt: string;
+}
+
+type Tab = "dashboard" | "import" | "add" | "categories" | "coach" | "projects";
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("dashboard");
@@ -83,6 +102,7 @@ export default function Home() {
         {(
           [
             ["dashboard", "Dashboard"],
+            ["projects", "Projects"],
             ["import", "Bulk Import"],
             ["add", "Add Note"],
             ["categories", "Categories"],
@@ -144,6 +164,9 @@ export default function Home() {
       {tab === "categories" && (
         <CategoriesView categories={categories} knowledge={knowledge} onRefresh={fetchData} />
       )}
+
+      {/* Projects */}
+      {tab === "projects" && <ProjectsView />}
 
       {/* AI Life Coach */}
       {tab === "coach" && <LifeCoachView />}
@@ -261,6 +284,21 @@ function DashboardView({
               <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap break-words flex-1 line-clamp-6">
                 {item.content}
               </p>
+              {item.attachments && item.attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {item.attachments.map((att) => (
+                    <a
+                      key={att.filename}
+                      href={att.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 px-2 py-1 rounded bg-[var(--accent)]/10 border border-[var(--accent)]/20 text-xs text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors"
+                    >
+                      {att.type.startsWith("image/") ? "\u{1F5BC}" : "\u{1F4CE}"} {att.originalName.length > 15 ? att.originalName.substring(0, 12) + "..." : att.originalName}
+                    </a>
+                  ))}
+                </div>
+              )}
               <div className="text-xs text-[var(--text-secondary)] opacity-60">
                 {new Date(item.createdAt).toLocaleDateString()}
               </div>
@@ -403,9 +441,40 @@ function AddNoteView({
   const [manualCategory, setManualCategory] = useState("");
   const [manualTitle, setManualTitle] = useState("");
   const [result, setResult] = useState("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/api/files", { method: "POST", body: formData });
+        if (res.ok) {
+          const data = await res.json();
+          setAttachments((prev) => [...prev, data]);
+        }
+      } catch {
+        setResult("File upload failed");
+      }
+    }
+    setUploading(false);
+    e.target.value = "";
+  };
+
+  const removeAttachment = (filename: string) => {
+    setAttachments((prev) => prev.filter((a) => a.filename !== filename));
+    fetch(`/api/files?filename=${filename}`, { method: "DELETE" });
+  };
 
   const handleAdd = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() && attachments.length === 0) return;
     setLoading(true);
     setResult("");
 
@@ -414,12 +483,13 @@ function AddNoteView({
         const res = await fetch("/api/organize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, mode: "single" }),
+          body: JSON.stringify({ text, mode: "single", attachments }),
         });
         const data = await res.json();
         if (res.ok) {
           setResult("Added and organized!");
           setText("");
+          setAttachments([]);
           setTimeout(onComplete, 1000);
         } else {
           setResult(`Error: ${data.error}`);
@@ -433,13 +503,14 @@ function AddNoteView({
         const res = await fetch("/api/knowledge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: manualTitle, content: text, category: manualCategory }),
+          body: JSON.stringify({ title: manualTitle, content: text, category: manualCategory, attachments }),
         });
         const data = await res.json();
         if (res.ok) {
           setResult("Added!");
           setText("");
           setManualTitle("");
+          setAttachments([]);
           setTimeout(onComplete, 1000);
         } else {
           setResult(`Error: ${data.error}`);
@@ -452,12 +523,14 @@ function AddNoteView({
     }
   };
 
+  const isImage = (type: string) => type.startsWith("image/");
+
   return (
     <div className="fade-in max-w-2xl">
       <div className="glass-card p-8">
         <h2 className="text-2xl font-bold mb-2">Add Knowledge</h2>
         <p className="text-[var(--text-secondary)] mb-6">
-          Add a new note. Toggle AI to have it auto-categorize, or manually assign a category.
+          Add notes, files, photos, links — anything. AI will auto-categorize or you can assign manually.
         </p>
 
         {/* AI Toggle */}
@@ -502,16 +575,55 @@ function AddNoteView({
         )}
 
         <textarea
-          className="input-field mb-6"
+          className="input-field mb-4"
           placeholder="Type or paste your note here..."
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={6}
         />
 
+        {/* File Upload */}
+        <div className="mb-6">
+          <label className="block mb-2 text-sm font-medium text-[var(--text-secondary)]">
+            Attach Files / Photos
+          </label>
+          <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-[var(--border)] rounded-xl cursor-pointer hover:border-[var(--accent)] transition-colors">
+            <span className="text-[var(--text-secondary)]">
+              {uploading ? "Uploading..." : "Click to upload files, photos, PDFs..."}
+            </span>
+            <input
+              type="file"
+              multiple
+              onChange={handleFileUpload}
+              className="hidden"
+              accept="image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx,.csv,.json,.zip"
+            />
+          </label>
+
+          {/* Attachment previews */}
+          {attachments.length > 0 && (
+            <div className="mt-3 grid gap-2">
+              {attachments.map((att) => (
+                <div key={att.filename} className="flex items-center gap-3 p-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border)]">
+                  {isImage(att.type) ? (
+                    <img src={att.url} alt={att.originalName} className="w-10 h-10 object-cover rounded" />
+                  ) : (
+                    <div className="w-10 h-10 rounded bg-[var(--accent)]/20 flex items-center justify-center text-xs font-bold text-[var(--accent)]">
+                      {att.originalName.split(".").pop()?.toUpperCase()}
+                    </div>
+                  )}
+                  <span className="flex-1 text-sm truncate">{att.originalName}</span>
+                  <span className="text-xs text-[var(--text-secondary)]">{(att.size / 1024).toFixed(0)}KB</span>
+                  <button onClick={() => removeAttachment(att.filename)} className="text-red-400 hover:text-red-300 text-lg">&times;</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <button
           onClick={handleAdd}
-          disabled={loading || !text.trim()}
+          disabled={loading || (!text.trim() && attachments.length === 0)}
           className="glow-btn px-8 py-3"
         >
           {loading ? (
@@ -634,6 +746,162 @@ function CategoriesView({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROJECTS VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function ProjectsView() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newProject, setNewProject] = useState<{ name: string; description: string; url: string; status: Project["status"]; type: Project["type"] }>({ name: "", description: "", url: "", status: "active", type: "website" });
+
+  useEffect(() => {
+    fetch("/api/projects").then(r => r.json()).then(setProjects);
+  }, []);
+
+  const addNewProject = async () => {
+    if (!newProject.name) return;
+    const res = await fetch("/api/projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...newProject, id: crypto.randomUUID() }),
+    });
+    if (res.ok) {
+      const p = await res.json();
+      setProjects([...projects, p]);
+      setNewProject({ name: "", description: "", url: "", status: "active", type: "website" });
+      setShowAdd(false);
+    }
+  };
+
+  const removeProject = async (id: string) => {
+    await fetch(`/api/projects?id=${id}`, { method: "DELETE" });
+    setProjects(projects.filter(p => p.id !== id));
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active": return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+      case "paused": return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
+      case "completed": return "bg-blue-500/20 text-blue-300 border-blue-500/30";
+      case "idea": return "bg-purple-500/20 text-purple-300 border-purple-500/30";
+      default: return "bg-gray-500/20 text-gray-300 border-gray-500/30";
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "website": return "\u{1F310}";
+      case "app": return "\u{1F4F1}";
+      case "business": return "\u{1F4BC}";
+      default: return "\u{1F4E6}";
+    }
+  };
+
+  return (
+    <div className="fade-in">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold gradient-text">My Projects</h2>
+        <button onClick={() => setShowAdd(!showAdd)} className="glow-btn px-4 py-2">
+          {showAdd ? "Cancel" : "+ New Project"}
+        </button>
+      </div>
+
+      {showAdd && (
+        <div className="glass-card p-6 mb-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <input
+              type="text"
+              placeholder="Project name"
+              value={newProject.name}
+              onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+              className="input-field"
+            />
+            <input
+              type="text"
+              placeholder="URL (optional)"
+              value={newProject.url}
+              onChange={(e) => setNewProject({ ...newProject, url: e.target.value })}
+              className="input-field"
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={newProject.description}
+              onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+              className="input-field md:col-span-2"
+            />
+            <select
+              value={newProject.type}
+              onChange={(e) => setNewProject({ ...newProject, type: e.target.value as Project["type"] })}
+              className="input-field"
+            >
+              <option value="website">Website</option>
+              <option value="app">App</option>
+              <option value="business">Business</option>
+              <option value="other">Other</option>
+            </select>
+            <select
+              value={newProject.status}
+              onChange={(e) => setNewProject({ ...newProject, status: e.target.value as Project["status"] })}
+              className="input-field"
+            >
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+              <option value="idea">Idea</option>
+            </select>
+          </div>
+          <button onClick={addNewProject} className="glow-btn px-6 py-2 mt-4">
+            Add Project
+          </button>
+        </div>
+      )}
+
+      {projects.length === 0 ? (
+        <div className="glass-card p-12 text-center">
+          <p className="text-[var(--text-secondary)] text-lg">No projects yet. Add your first project above.</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <div key={project.id} className="glass-card p-5 group relative">
+              <button
+                onClick={() => removeProject(project.id)}
+                className="absolute top-3 right-3 text-[var(--text-secondary)] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                &times;
+              </button>
+              <div className="flex items-start gap-3 mb-3">
+                <span className="text-2xl">{getTypeIcon(project.type)}</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-lg truncate">{project.name}</h3>
+                  {project.url && (
+                    <a
+                      href={project.url.startsWith("http") ? project.url : `https://${project.url}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-[var(--accent)] hover:underline truncate block"
+                    >
+                      {project.url}
+                    </a>
+                  )}
+                </div>
+              </div>
+              {project.description && (
+                <p className="text-sm text-[var(--text-secondary)] mb-3">{project.description}</p>
+              )}
+              <span className={`inline-block px-2 py-0.5 rounded-full text-xs border ${getStatusColor(project.status)}`}>
+                {project.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
