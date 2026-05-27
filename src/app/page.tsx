@@ -61,7 +61,12 @@ interface Project {
   createdAt: string;
 }
 
-type Tab = "dashboard" | "import" | "add" | "categories" | "coach" | "projects";
+type Tab = "dashboard" | "import" | "add" | "categories" | "coach" | "projects" | "chat";
+
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
 
 const PIN_CODE = "242766";
 
@@ -197,6 +202,7 @@ export default function Home() {
         {(
           [
             ["dashboard", "Dashboard"],
+            ["chat", "Chat"],
             ["projects", "Projects"],
             ["import", "Bulk Import"],
             ["add", "Add Note"],
@@ -262,6 +268,9 @@ export default function Home() {
 
       {/* Projects */}
       {tab === "projects" && <ProjectsView />}
+
+      {/* AI Chat */}
+      {tab === "chat" && <ChatView categories={categories} onRefresh={fetchData} />}
 
       {/* AI Life Coach */}
       {tab === "coach" && <LifeCoachView />}
@@ -1204,6 +1213,122 @@ function LifeCoachView() {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AI CHAT VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function ChatView({ categories, onRefresh }: { categories: Category[]; onRefresh: () => void }) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("kb_chat_history");
+      if (saved) setMessages(JSON.parse(saved));
+    } catch { /* ignore */ }
+  }, []);
+
+  const saveMessages = (msgs: ChatMessage[]) => {
+    setMessages(msgs);
+    localStorage.setItem("kb_chat_history", JSON.stringify(msgs.slice(-50)));
+  };
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg: ChatMessage = { role: "user", content: input.trim() };
+    const updated = [...messages, userMsg];
+    saveMessages(updated);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMsg.content,
+          history: updated.slice(-10),
+          categories: categories.map((c) => ({ id: c.id, name: c.name })),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const aiMsg: ChatMessage = { role: "assistant", content: data.response };
+        saveMessages([...updated, aiMsg]);
+        if (data.organized && data.organized.length > 0) {
+          onRefresh();
+        }
+      } else {
+        saveMessages([...updated, { role: "assistant", content: `Error: ${data.error}` }]);
+      }
+    } catch {
+      saveMessages([...updated, { role: "assistant", content: "Network error. Try again." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fade-in flex flex-col" style={{ height: "calc(100vh - 240px)" }}>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-xl font-bold gradient-text">AI Chat</h2>
+          <p className="text-xs text-[var(--text-secondary)]">Send notes, ask questions, or tell the AI how to organize things</p>
+        </div>
+        <button onClick={() => { saveMessages([]); }} className="tab-btn px-3 py-1 text-xs">Clear</button>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto space-y-3 mb-3 pr-1">
+        {messages.length === 0 && (
+          <div className="glass-card p-6 text-center text-[var(--text-secondary)] text-sm">
+            <p className="mb-2 font-medium">Send me anything and I&apos;ll organize it.</p>
+            <p>Examples:</p>
+            <p className="mt-1 text-xs opacity-70">&quot;Here&apos;s my Netflix login: email@gmail.com pass: abc123&quot;</p>
+            <p className="text-xs opacity-70">&quot;Put this in my passwords category&quot;</p>
+            <p className="text-xs opacity-70">&quot;I have a business idea for...&quot;</p>
+            <p className="text-xs opacity-70">&quot;Name this note Business Plan for Aaron&quot;</p>
+          </div>
+        )}
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
+              msg.role === "user"
+                ? "bg-[var(--accent)]/20 border border-[var(--accent)]/30 rounded-br-sm"
+                : "glass-card rounded-bl-sm"
+            }`}>
+              {msg.content}
+            </div>
+          </div>
+        ))}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="glass-card rounded-2xl rounded-bl-sm px-4 py-2.5 text-sm">
+              <span className="spinner inline-block mr-2" />Thinking...
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Input */}
+      <div className="flex gap-2">
+        <textarea
+          className="input-field flex-1 resize-none"
+          rows={2}
+          placeholder="Send notes, instructions, or questions..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+        />
+        <button onClick={sendMessage} disabled={loading || !input.trim()} className="glow-btn px-4 shrink-0">
+          Send
+        </button>
+      </div>
     </div>
   );
 }

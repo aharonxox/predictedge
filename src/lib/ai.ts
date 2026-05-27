@@ -326,6 +326,79 @@ Respond with ONLY valid JSON:
 }
 
 // ═══════════════════════════════════════════════════════════════
+// AI CHAT — Conversational interface with smart organization
+// ═══════════════════════════════════════════════════════════════
+
+interface ChatResult {
+  response: string;
+  saveItems: { title: string; content: string; category: string }[];
+}
+
+export async function chatWithAI(
+  message: string,
+  history: { role: string; content: string }[],
+  categories: { id: string; name: string }[],
+  recentContext: string
+): Promise<ChatResult> {
+  const categoryList = categories.map((c) => `"${c.id}" (${c.name})`).join(", ");
+
+  const systemPrompt = `You are a smart knowledge organizer assistant. You help the user store, organize, and manage their notes.
+
+AVAILABLE CATEGORIES: ${categoryList}
+
+RECENT KNOWLEDGE (for context):
+${recentContext}
+
+YOUR BEHAVIOR:
+1. When the user sends you information (passwords, links, ideas, contacts, etc.), you MUST save it by including "saveItems" in your response.
+2. SPLIT multi-topic messages into SEPARATE items. For example, if someone sends you a file about themselves that has business info, health info, and personal info — split it into multiple items in different categories.
+3. LISTEN to the user's instructions. If they say "put this in passwords" or "name it Business Plan" — do exactly that.
+4. PRESERVE all sensitive data EXACTLY (passwords, links, numbers, emails, credentials). Never modify them.
+5. If the user is just chatting or asking a question (not adding knowledge), respond helpfully WITHOUT saving anything.
+6. Give short, clear titles to each saved item.
+7. If you're unsure which category, use "other".
+
+RESPONSE FORMAT (JSON only):
+{
+  "response": "<your conversational reply to the user — confirm what you saved, answer questions, etc.>",
+  "saveItems": [
+    {"title": "short title", "content": "full preserved content", "category": "category_id"},
+    ...
+  ]
+}
+
+If nothing to save, use empty array: "saveItems": []
+
+CRITICAL: 
+- NEVER change passwords, links, emails, phone numbers, API keys — keep them EXACTLY as given
+- ALWAYS split multi-topic content into separate items
+- Response must be valid JSON`;
+
+  const messages = [
+    { role: "system", content: systemPrompt },
+    ...history.slice(-8).map((m) => ({ role: m.role, content: m.content })),
+    { role: "user", content: message },
+  ];
+
+  const responseText = await callWithFailover(messages, 4000);
+
+  try {
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        response: parsed.response || "Done.",
+        saveItems: Array.isArray(parsed.saveItems) ? parsed.saveItems : [],
+      };
+    }
+  } catch {
+    // If JSON parsing fails, treat the whole response as a conversational reply
+  }
+
+  return { response: responseText || "I couldn't process that. Try again.", saveItems: [] };
+}
+
+// ═══════════════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════════════
 
