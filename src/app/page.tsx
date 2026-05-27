@@ -53,13 +53,94 @@ interface Project {
 
 type Tab = "dashboard" | "import" | "add" | "categories" | "coach" | "projects";
 
+const PIN_CODE = "242766";
+
+function PinLockScreen({ onUnlock }: { onUnlock: () => void }) {
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState(false);
+
+  const handleDigit = (digit: string) => {
+    if (pin.length >= 6) return;
+    const newPin = pin + digit;
+    setPin(newPin);
+    setError(false);
+    if (newPin.length === 6) {
+      if (newPin === PIN_CODE) {
+        localStorage.setItem("kb_auth", "true");
+        onUnlock();
+      } else {
+        setError(true);
+        setTimeout(() => { setPin(""); setError(false); }, 800);
+      }
+    }
+  };
+
+  const handleDelete = () => {
+    setPin(pin.slice(0, -1));
+    setError(false);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="glass-card p-8 w-full max-w-sm text-center">
+        <h1 className="text-2xl font-extrabold tracking-tight gradient-text mb-2">Knowledge Base</h1>
+        <p className="text-[var(--text-secondary)] text-sm mb-8">Enter your 6-digit PIN</p>
+
+        {/* PIN dots */}
+        <div className="flex justify-center gap-3 mb-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className={`w-4 h-4 rounded-full border-2 transition-all ${
+                error ? "border-red-400 bg-red-400" :
+                i < pin.length ? "border-[var(--accent)] bg-[var(--accent)]" :
+                "border-[var(--border)] bg-transparent"
+              } ${error ? "animate-pulse" : ""}`}
+            />
+          ))}
+        </div>
+
+        {/* Keypad */}
+        <div className="grid grid-cols-3 gap-3 max-w-[240px] mx-auto">
+          {["1","2","3","4","5","6","7","8","9","","0",""].map((digit, i) => {
+            if (i === 9) return <div key="empty1" />;
+            if (i === 11) return (
+              <button key="del" onClick={handleDelete} className="w-16 h-16 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--accent)]/10 transition-colors text-sm font-medium mx-auto">
+                DEL
+              </button>
+            );
+            return (
+              <button
+                key={digit}
+                onClick={() => handleDigit(digit)}
+                className="w-16 h-16 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center text-xl font-bold hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/30 transition-colors mx-auto"
+              >
+                {digit}
+              </button>
+            );
+          })}
+        </div>
+
+        {error && <p className="text-red-400 text-sm mt-4">Wrong PIN</p>}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
+  const [authed, setAuthed] = useState(false);
   const [tab, setTab] = useState<Tab>("dashboard");
   const [knowledge, setKnowledge] = useState<KnowledgeItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem("kb_auth") === "true") {
+      setAuthed(true);
+    }
+  }, []);
 
   const fetchData = useCallback(async () => {
     const [kRes, cRes] = await Promise.all([
@@ -73,8 +154,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (authed) fetchData();
+  }, [fetchData, authed]);
+
+  if (!authed) {
+    return <PinLockScreen onUnlock={() => setAuthed(true)} />;
+  }
 
   const filteredKnowledge = knowledge.filter((item) => {
     const matchesCategory = filterCategory === "all" || item.category === filterCategory;
