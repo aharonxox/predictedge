@@ -1,0 +1,15 @@
+{
+  "knowledge": [],
+  "categories": [
+    { "id": "links", "name": "Links & URLs", "description": "Web links, bookmarks, and URLs", "color": "#6366f1" },
+    { "id": "passwords", "name": "Passwords & Credentials", "description": "Login info and access credentials", "color": "#ef4444" },
+    { "id": "ideas", "name": "Ideas & Thoughts", "description": "Creative ideas and brainstorming", "color": "#f59e0b" },
+    { "id": "tasks", "name": "Tasks & To-Do", "description": "Things to do and action items", "color": "#10b981" },
+    { "id": "contacts", "name": "Contacts & People", "description": "Phone numbers, emails, people info", "color": "#8b5cf6" },
+    { "id": "finance", "name": "Finance & Money", "description": "Financial info, transactions, budgets", "color": "#06b6d4" },
+    { "id": "personal", "name": "Personal Notes", "description": "Personal thoughts and reflections", "color": "#ec4899" },
+    { "id": "work", "name": "Work & Business", "description": "Work-related notes and business info", "color": "#3b82f6" },
+    { "id": "learning", "name": "Learning & Reference", "description": "Things learned, reference material", "color": "#14b8a6" },
+    { "id": "other", "name": "Other", "description": "Miscellaneous items", "color": "#6b7280" }
+  ]
+}

@@ -1,0 +1,194 @@
+════════════════════════════════════════════════════
+     USER CONTEXT SUMMARY — AI-to-AI Import Prompt
+     Generated: April 13, 2026
+════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. DEMOGRAPHICS INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The user's name is Aharon Ohevshalom.
+  - Evidence: Listed in stored master prompt context. Date: 2026-03-31.
+
+The user's Hebrew name is אהארון.
+  - Evidence: User stated "Hebrew name אהארון." Date: 2026-04-13.
+
+The user is 16 years old, born August 22, 2009.
+  - Evidence: User stated "My birthday is August 22 2009."
+    Date: 2026-04-13.
+
+The user resides in Los Angeles, California (Pacific Time).
+  - Evidence: Consistently referenced as operating base. Date: 2026-03-31.
+
+The user is Jewish and holds a green card.
+  - Evidence: Stored in memory records. Date: 2026-02-19.
+
+The user's education includes homeschooling (stopped) and high school
+(dropped out).
+  - Evidence: "The user was homeschooled but stopped because it was not
+    teaching useful things." Date: 2026-02-18. "The user has dropped out
+    of high school for now." Date: 2026-03-09.
+
+The user is self-taught in computers, primarily through YouTube.
+  - Evidence: Stored memory record. Date: 2026-02-18.
+
+The user's occupation is freelance web designer and trader.
+  - Evidence: Active Fiverr profile and crypto trading instructions
+    stored in memory. Date: 2026-03-09.
+
+The user has a pinkslip work permit but no full worker's permit and no car.
+  - Evidence: Stored memory record. Date: 2026-03-09.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. INTERESTS & PREFERENCES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The user actively builds and sells websites to clients using Vercel.
+  - Evidence: "The user is a website designer who builds and sells
+    websites to clients, deploys portfolio sites on Vercel, and does
+    a lot of manual work on their own." Date: 2026-03-09.
+
+The user prefers a luxury abstract aesthetic for websites.
+  - Evidence: "The user prefers luxury abstract aesthetic techniques
+    including layered gradients, glassmorphism, dramatic abstract shapes,
+    and luxury typography." Date: 2026-04-01.
+
+The user's design inspiration sites are Apple, Meta, Gemini, and
+premium design layouts.
+  - Evidence: User stated "sites I like the look of are apple meta
+    Gemini and premium design layouts." Date: 2026-04-13.
+
+The user actively researches and integrates AI tools and APIs,
+including free Claude API via Mac terminal.
+  - Evidence: Stored memory records. Date: 2026-04-07.
+
+The user trades cryptocurrency with a strict capital-preservation approach.
+  - Evidence: Custom instruction stored verbatim: "Role: You are a
+    Conservative AI Crypto Analyst. Your priority is Capital
+    Preservation over high profits." Date: on file.
+
+The user is actively bulking and needs a fitness coach.
+  - Evidence: User stated "I'm trying to bulk I've need a coach."
+    Date: 2026-04-13. Memory record: "The user is trying to bulk."
+    Date: 2026-03-26.
+
+The user researched Israeli army prep schools (mechinot) in Rishon
+LeZion and Modi'in-Maccabim-Re'ut areas and plans to move to Israel.
+  - Evidence: User stated "moving to Israel hopefully."
+    Date: 2026-04-13. Memory record confirmed. Date: 2026-04-13.
+
+The user is interested in nootropics.
+  - Evidence: "The user researched reviews and real user experiences
+    with Enjoyable Cactus Cooler neuro enhancer gummies."
+    Date: 2026-03-25.
+
+The user uses v0 by Vercel without a subscription for web development.
+  - Evidence: Stored memory record. Date: 2026-04-05.
+
+The user watches anime (Naruto).
+  - Evidence: Noted in stored user profile. Date: on file.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. RELATIONSHIPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The user lives with 2 parents and 6 siblings.
+  - Evidence: User stated "I have 6 siblings and 2 parents."
+    Date: 2026-04-13.
+
+The user recently ended a 5-month relationship.
+  - Evidence: User stated "had a girlfriend broke up with her dated
+    for 5 months." Date: 2026-04-13.
+
+The user has at least one friend who plays Quest Proof with them.
+  - Evidence: Stored memory record. Date: 2026-04-01.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. DATED EVENTS, PROJECTS & PLANS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Dec 2023 – Feb 2026] The user worked for a single employer.
+  - Evidence: "The user worked for an employer from December 1, 2023
+    to February 13, 2026." Date: 2026-02-19.
+
+[2026-02-05] The user ran a flower subscription/delivery business in
+LA, navigating logistics without a car.
+  - Evidence: Conversation about bouquet delivery using TaskRabbit
+    and Uber Courier as a 16-year-old without a car. Date: 2026-02-05.
+
+[2026-03-09] The user launched Fiverr web design services at $150/client
+under the Instagram handle webdesign4u.
+  - Evidence: Stored memory records. Date: 2026-03-09.
+
+[2026-03-09] The user built the BrandParty app.
+  - Evidence: "The user developed the BrandParty app."
+    Date: 2026-03-09.
+
+[2026-03-10] The user passed their learner's permit test.
+  - Evidence: Stored memory record. Date: 2026-03-10.
+
+[2026-03-31] The user built a personalized Master Prompt to carry
+context across AI sessions.
+  - Evidence: Conversation record of prompt construction.
+    Date: 2026-03-31.
+
+[2026-04-13] The user is actively building an app intended for sale,
+currently blocked by difficulty with advertisement.
+  - Evidence: User stated "actively trying to make an app people
+    would love to buy struggling on advertisement." Date: 2026-04-13.
+
+[2026-04-13] The user is planning to move to Israel and researching
+army prep (mechinot) schools in specific regions.
+  - Evidence: User stated "moving to Israel hopefully."
+    Date: 2026-04-13. Memory record. Date: 2026-04-13.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. INSTRUCTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The user requires the AI to execute tasks, not explain them.
+  - Evidence (verbatim): "Don't tell me this is how you do this when
+    I give you something to do you're the doer if I ask you to do
+    you do don't tell me how to do." Date: 2026-04-13.
+
+The user requires short, full-context responses using only what
+is necessary.
+  - Evidence (verbatim): "respond explaining and short but full
+    context use what's necessary." Date: 2026-04-13.
+
+The user requires all browser/session observations to be remembered
+for future improvement.
+  - Evidence (verbatim): "anything you see on control browser you
+    should remember and learn to be better." Date: on file.
+
+The user requires all crypto analysis to follow the "3-Key Rule."
+  - Evidence (verbatim): "Only issue a 'Trade' signal if at least
+    THREE of the following are true simultaneously: Trend
+    Confirmation... Momentum Buffer: RSI is between 40-60...
+    Volatility Filter... Volume Spike." Date: on file.
+
+The user requires strict risk controls on all trades.
+  - Evidence (verbatim): "Risk per Trade: 0.5% maximum risk of total
+    account balance." / "Max Daily Loss (Circuit Breaker): If losses
+    reach 2% in one day, stop all analysis and signals for 24 hours."
+    Date: on file.
+
+The user requires a "NO TRADE" output when trade conditions are not
+fully met.
+  - Evidence (verbatim): "If the conditions are not perfect, your
+    output must be 'NO TRADE - Market noise too high' with a brief
+    explanation of which safety rule was not met." Date: on file.
+
+The user requires every business/idea suggestion to be filtered
+through real constraints.
+  - Evidence: No car · No full work permit · Currently broke ·
+    3-6 month cash timeline · AI-first solutions only.
+    Date: 2026-03-31.
+
+════════════════════════════════════════════════════
+                  END OF SUMMARY
+════════════════════════════════════════════════════
