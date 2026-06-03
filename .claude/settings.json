@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "Bash(npm run *)",
+      "Bash(npx *)",
+      "Bash(git *)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)"
+    ]
+  },
+  "plugins": {
+    "sources": [
+      "anthropics/claude-code/plugins/frontend-design",
+      "anthropics/claude-code/plugins/security-guidance",
+      "anthropics/claude-code/plugins/code-review",
+      "anthropics/claude-code/plugins/feature-dev",
+      "anthropics/claude-code/plugins/pr-review-toolkit",
+      "anthropics/claude-code/plugins/commit-commands"
+    ]
+  }
+}
